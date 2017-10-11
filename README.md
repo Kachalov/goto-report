@@ -258,6 +258,10 @@
 ```
 ![nested_nores](.imgs/plain_res.png)
 
+## Примеры
+* [redis/config.c#L208](https://github.com/antirez/redis/blob/unstable/src/config.c#L208)
+* [redis/geo.c#L113](https://github.com/antirez/redis/blob/unstable/src/geo.c#L113)
+
 ## Выводы
 * При отсутствии работы с ресурсами возможно непосредственное возвращение
 кода ошибки
@@ -267,3 +271,6 @@
 использовать вложенные if
 * При большом количестве операций проверок и работе с ресурсами целесообразно
 использовать безусловный переход
+
+## Литература
+* [Хабр: Запретный плод GOTO сладок!](https://habrahabr.ru/post/114211/)
