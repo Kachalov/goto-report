@@ -54,6 +54,32 @@ int return_nores (void)
 Как видно из графа, лишних сравнений производиться не будет.
 
 ### Return с ресурсами (правильный вариант)
+```c
+#define error(err, err_no, label) {err = err_no; goto label;}
+```
+```c
+int return_res_noleak (void)
+{
+    int err = EOK;
+    uint8_t *foo_p = (uint8_t *)malloc(sizeof(uint8_t));
+    if (foo_p == NULL)
+        error(err, EFOO, failure);
+
+    int bar = rand();
+    if (bar == 0)
+        error(err, EBAR, failure);
+
+    int baz = rand();
+    if (baz == 0)
+        error(err, EBAZ, failure);
+
+    failure:
+    if (foo_p != NULL)
+        free(foo_p);
+
+    return err;
+}
+```
 ```asm
 0804850b <return_res_noleak>:
  804850b:	push   ebp
@@ -142,6 +168,36 @@ int return_nores (void)
 завершает работу с ресурсами (не очищает память).
 
 ### Вложенные if без ресурсов
+```c
+int nested_nores (void)
+{
+    int err = EOK;
+    int foo = rand();
+
+    if (foo == 0)
+    {
+        err = EFOO;
+    }
+    else
+    {
+        int bar = rand();
+        if (bar == 0)
+        {
+            err = EBAR;
+        }
+        else
+        {
+            int baz = rand();
+            if (baz == 0)
+            {
+                err = EBAZ;
+            }
+        }
+    }
+
+    return err;
+}
+```
 ```asm
 0804857d <nested_nores>:
  804857d:	push   ebp
@@ -217,6 +273,37 @@ int return_nores (void)
 однако сохраняется проблема читаемости кода, особенно при большом количестве проверок.
 
 ### Последовательность if без ресурсов
+```c
+int plain_nores (void)
+{
+    int err = EOK;
+    int foo = rand();
+    if (foo == 0)
+    {
+        err = EFOO;
+    }
+
+    if (err == EOK)
+    {
+        int bar = rand();
+        if (bar == 0)
+        {
+            err = EBAR;
+        }
+    }
+
+    if (err == EOK)
+    {
+        int baz = rand();
+        if (baz == 0)
+        {
+            err = EBAZ;
+        }
+    }
+
+    return err;
+}
+```
 ```asm
 0804863d <plain_nores>:
  804863d:	push   ebp
